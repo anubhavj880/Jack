@@ -143,7 +143,7 @@ class TradeClient():
 
 
 
-    def et_openorders(self):
+    def get_openorders(self):
 
         payload = {"request": "/v1/orders", "nonce": self.get_nonce()}
 

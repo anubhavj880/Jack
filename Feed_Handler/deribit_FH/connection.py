@@ -3,16 +3,12 @@ import Utils
 import time
 import thread
 import json
-import base64
-
 
 
 log = Utils.getLogger(loggerName='DERIBITDataRecorder',logLevel='INFO')
 
 class DerbitConnection():
-    gemini_api_key = ""
-    gemini_api_secret = ""
-
+    
     def __init__(self, url,payload, onUpdate):
         self.url = url
         self.payload = payload
@@ -76,7 +72,7 @@ class DerbitConnection():
     def _on_message(self, ws, message):
         try:
             exchData = json.loads(message)
-            print(exchData)
+            print(message)
             if type(exchData) is dict and (exchData["success"] == True) and ('bids' in exchData["result"]) and ('asks' in exchData["result"]):
                 self.orderBookData(exchData['result'])
             elif type(exchData) is dict and (exchData["success"] == True) and type(exchData["result"]) is list and (len(exchData['result']) > 0) and ('tradeId' in exchData['result'][0].keys()):
@@ -84,7 +80,7 @@ class DerbitConnection():
                     self.onUpdate([float(trade['price']), float(trade['quantity']), trade['tradeId']],'tradebook_' + str(trade['instrument']))
             elif type(exchData) is dict and exchData['success'] == True:
                 self.onUpdate(exchData)
-                print(exchData)
+
         except Exception as ex:
             log.error("The following Exception has occured in _On_Message method  : " + str(ex))
 

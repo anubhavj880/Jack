@@ -1,7 +1,7 @@
 import time, datetime
 import threading
 import Utils
-from connection import DerbitConnection
+from connection import GeminiConnection
 log = Utils.getLogger(loggerName='GEMINIDataRecorder',logLevel='INFO')
 
 books = {}
@@ -91,6 +91,7 @@ class Book():
         for i in range(5):
             msg += '%.8f %.8f | %.8f %.8f\n' % (self.bid(i), self.bidSize(i), self.ask(i), self.askSize(i))
         log.info(msg)
+        print(msg)
 
 def onUpdate(data, channel_name, maxNbLimit=None):
     if type(data) is list:
@@ -144,9 +145,9 @@ def connect_handler(subscription):
 
 def start(url,type):
     if type == 'm':
-        DerbitConnection(url, onUpdate).connect_Socket(1)
+        GeminiConnection(url, onUpdate).connect_Socket(1)
     if type == 'p':
-        DerbitConnection(url, onPrivateUpdate).connect_Socket(2)
+        GeminiConnection(url, onPrivateUpdate).connect_Socket(2)
 
 def publicSchema(channels):
     global socketUrlList

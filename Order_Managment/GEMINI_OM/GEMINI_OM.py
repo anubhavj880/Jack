@@ -15,9 +15,9 @@ class MyGEMINI():
 
 class OM():
     def __init__(self):
-        self.exchCode = 'CCEX'
-        self.ccexConfig = MyGEMINI()
-        self.trading_client = gem.TradeClient(self.ccexConfig)
+        self.exchCode = 'GEMINI'
+        self.geminiConfig = MyGEMINI()
+        self.trading_client = gem.TradeClient(self.geminiConfig)
 
     def create(self, o):
         ackMsg = self.trading_client.place_order(market= o.symbol, quantity = o.qty, rate=o.price, side=o.side) # here you have to pass the order side as buy  or sell

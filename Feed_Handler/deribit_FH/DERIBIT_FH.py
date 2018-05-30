@@ -252,7 +252,7 @@ def publicSchema(channels):
 
 def main(channels=''):
 
-    publicSchemaList = publicSchema([('trade', 'BTC-29JUN18'),('private', 'BTC-29JUN18')])
+    publicSchemaList = publicSchema([('private', 'BTC-29JUN18')])
     connect_handler(publicSchemaList)
     while True:
         time.sleep(1)

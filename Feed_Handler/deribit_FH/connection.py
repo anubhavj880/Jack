@@ -3,7 +3,7 @@ import Utils
 import time
 import thread
 import json
-
+import multiprocessing
 
 log = Utils.getLogger(loggerName='DERIBITDataRecorder',logLevel='INFO')
 
@@ -73,22 +73,26 @@ class DerbitConnection():
         try:
             exchData = json.loads(message)
             print(message)
-            if type(exchData) is dict and (exchData["success"] == True) and ('bids' in exchData["result"]) and ('asks' in exchData["result"]):
+            if type(exchData) is dict and  exchData.has_key('notifications'):
+                self.onUpdate(exchData)
+            elif type(exchData) is dict and (exchData["success"] == True) and ('bids' in exchData["result"]) and ('asks' in exchData["result"]):
                 self.orderBookData(exchData['result'])
             elif type(exchData) is dict and (exchData["success"] == True) and type(exchData["result"]) is list and (len(exchData['result']) > 0) and ('tradeId' in exchData['result'][0].keys()):
                 for trade in exchData['result']:
                     self.onUpdate([float(trade['price']), float(trade['quantity']), trade['tradeId']],'tradebook_' + str(trade['instrument']))
-            elif type(exchData) is dict and exchData['success'] == True:
-                self.onUpdate(exchData)
 
         except Exception as ex:
-            log.error("The following Exception has occured in _On_Message method  : " + str(ex))
+            self.onUpdate(exchData)
+
+
 
     def orderBookData(self, rawOrderData):
         bids = []
         bidSizes = []
         asks = []
         askSizes = []
+        del self.bidOrderBook[:]
+        del self.askOrderBook[:]
         for orderUpdate in rawOrderData["bids"]:
             self.bidOrderBook.append(orderUpdate)
         for orderUpdate in rawOrderData["asks"]:

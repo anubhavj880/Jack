@@ -10,8 +10,8 @@ class y:
         self.side = side
 
 obj = om.OM()
-a = y('ETHUSD',100, 0.01, 'buy')
-#print(obj.create(a))
+a = y('BTCUSD',0.00001, 0.01, 'buy')
+print(obj.create(a))
 
 data = '''{
     "order_id": "22333",
@@ -34,7 +34,7 @@ data = '''{
 datastore = json.loads(data)
 #print(obj.isActive(datastore))
 
-#print(obj.cxl('8228499'))
+#print(obj.cxl('3825292680'))
 
 
 cxl_data = '''{
@@ -148,5 +148,5 @@ open_order = '''
 
 
 open = json.loads(open_order)
-print(obj.getInitActiveOrders(open)[0].side)
+#print(obj.getInitActiveOrders(open)[0].side)
 

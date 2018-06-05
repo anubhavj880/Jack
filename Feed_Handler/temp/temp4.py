@@ -46,9 +46,23 @@ data = json.dumps(
 
     {
         "id": random.randint(999, 99999),
-        "action": "/api/v1/private/orderstate",
-        "arguments": {"orderId": "4680272953"},
-        "sig": generate_signature("/api/v1/private/orderstate", {"orderId": "4680272953"})
+        "action": "/api/v1/private/subscribe",
+        "arguments": {
+            "instrument": [
+                "all"
+            ],
+            "event": [
+                "user_order"
+            ]
+        },
+        "sig": generate_signature("/api/v1/private/subscribe", {
+            "instrument": [
+                "all"
+            ],
+            "event": [
+                "user_order"
+            ]
+        })
 
     }
 

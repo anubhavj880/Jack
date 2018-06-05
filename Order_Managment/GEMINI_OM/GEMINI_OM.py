@@ -10,8 +10,8 @@ def nowStr(isDate=False):
 
 class MyGEMINI():
     def __init__(self):
-        self.key = "P5BDs6mjLEi5IbXHXKIy"
-        self.secret = "25Uio9hQZjpp3iYLpQ1AhLgc7zV4"
+        self.key = "FRMAO7tan8xAXBYcTbnx"
+        self.secret = "rXY5a3jCunTQQ8Cw7PKopLYG6Y8"
 
 class OM():
     def __init__(self):

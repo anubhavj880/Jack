@@ -134,9 +134,9 @@ def connect_handler(subscription):
             socketThread.daemon = True
             socketThread.start()
 
-        socketThread = threading.Thread(target=start, args=(subscription[-1], 'p'))
-        socketThread.daemon = True
-        socketThread.start()
+        #socketThread = threading.Thread(target=start, args=(subscription[-1], 'p'))
+        #socketThread.daemon = True
+        #socketThread.start()
 
 
 

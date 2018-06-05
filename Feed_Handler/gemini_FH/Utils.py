@@ -29,7 +29,7 @@ def getLogger(loggerName='test', logLevel='INFO'):
     return logger
 
 def prepareChannels_GEMINI():
-    return ['ETHBTC']
+    return ['BTCUSD']
 
 
 

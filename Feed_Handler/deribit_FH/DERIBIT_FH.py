@@ -173,7 +173,7 @@ def connect_handler(subscription):
                 socketThread = multiprocessing.Process(target=start,args=(SocketUrl_payload,'m'))
                 socketThread.daemon = True
                 socketThread.start()
-            if json.loads(SocketUrl_payload[1])['action'] == '/api/v1/private/getopenorders':
+            if json.loads(SocketUrl_payload[1])['action'] == '/api/v1/private/subscribe':
                 socketThread = multiprocessing.Process(target=start, args=(SocketUrl_payload, 'p'))
                 socketThread.daemon = True
                 socketThread.start()
@@ -236,23 +236,39 @@ def publicSchema(channels):
 
                 {
                     "id": random.randint(99,999999),
-                    "action": "/api/v1/private/getopenorders",
+                    "action": "/api/v1/private/subscribe",
                     "arguments": {
-                        "instrument": channel[1]
+                        "instrument": [
+                            "all"
+                        ],
+                        "event": [
+                            channel[1]
+                        ]
                     },
-                    "sig": generate_signature("/api/v1/private/getopenorders", {"instrument": channel[1]})
+                    "sig": generate_signature("/api/v1/private/subscribe", {
+                        "instrument": [
+                            "all"
+                        ],
+                        "event": [
+                            "user_order"
+                        ]
+                    })
 
                 }
 
             )
+            print(data)
             url_payload.append(data)
             argList.append(url_payload)
 
     return argList
 
 def main(channels=''):
+    '''
+        If channel is private then give the order id to get current status of the order
 
-    publicSchemaList = publicSchema([('private', 'BTC-29JUN18')])
+    '''
+    publicSchemaList = publicSchema([('trade', 'BTC-29JUN18'),('private', "user_order")])
     connect_handler(publicSchemaList)
     while True:
         time.sleep(1)

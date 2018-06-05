@@ -10,8 +10,8 @@ from hashlib import sha384
 log = Utils.getLogger(loggerName='GEMINIDataRecorder',logLevel='INFO')
 
 class GeminiConnection():
-    gemini_api_key = "rIqNP1kyOXUWdoKqv974"
-    gemini_api_secret = "4DNYjwTMy4M4t25bLy9QmL2hEsBC"
+    gemini_api_key = "FRMAO7tan8xAXBYcTbnx"
+    gemini_api_secret = "rXY5a3jCunTQQ8Cw7PKopLYG6Y8"
 
     payload = base64.b64encode(json.dumps({
         'request': '/v1/order/events',
@@ -108,6 +108,7 @@ class GeminiConnection():
 
     def _on_message(self, ws, message):
         try:
+            print(message)
             exchData = json.loads(message)
             if type(exchData) is dict and ('type' in exchData) and (exchData['type'] == 'update') and (exchData['socket_sequence'] == 0):
                 self.orderBookData(exchData['events'])

@@ -49,18 +49,18 @@ data = json.dumps(
         "action": "/api/v1/private/subscribe",
         "arguments": {
             "instrument": [
-                "all"
+                "futures"
             ],
             "event": [
-                "user_order"
+                "order_book", "user_order", "trade"
             ]
         },
         "sig": generate_signature("/api/v1/private/subscribe", {
             "instrument": [
-                "all"
+                "futures"
             ],
             "event": [
-                "user_order"
+                "order_book", "user_order", "trade"
             ]
         })
 
@@ -79,15 +79,7 @@ def on_close(ws):
 
 def on_open(ws):
     print "### open ###"
-    def run(*args):
-        while True:
-            time.sleep(1)
-            ws.send(data)
-            #print(data)
-        time.sleep(1)
-        ws.close()
-    thread.start_new_thread(run, ())
-
+    ws.send(data)
 
 
 

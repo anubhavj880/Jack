@@ -9,7 +9,7 @@ class y:
         self.side = side
 
 obj = om.OM()
-a = y('BTC-29JUN18',1, 6000, 'buy')
+a = y('BTC-29JUN18',1, 5000, 'buy')
 #print(obj.create(a))
 
 
@@ -57,7 +57,7 @@ class x:
 b = x("4677333909")
 #print(obj.checkOrderStatus(b))
 
-print(obj.cxl('4739629142'))
+print(obj.cxl('4912774384'))
 
 
 data = '''{  

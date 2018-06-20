@@ -9,11 +9,12 @@ log = Utils.getLogger(loggerName='DERIBITDataRecorder',logLevel='INFO')
 
 class DerbitConnection():
     
-    def __init__(self, url,payload, onUpdate):
+    def __init__(self, url,payload, onUpdate,onPrivateUpdate):
         self.url = url
         self.payload = payload
         self.socket = self.onConnected = self.onReconnected = self.onDisconnected = self.onConnectError = None
         self.onUpdate = onUpdate
+        self.onPrivateUpdate = onPrivateUpdate
         self.bidOrderBook = []
         self.askOrderBook = []
         self.disconnect_called = False
@@ -73,16 +74,17 @@ class DerbitConnection():
         try:
             exchData = json.loads(message)
             print(message)
-            if type(exchData) is dict and  exchData.has_key('notifications'):
-                self.onUpdate(exchData)
-            elif type(exchData) is dict and (exchData["success"] == True) and ('bids' in exchData["result"]) and ('asks' in exchData["result"]):
-                self.orderBookData(exchData['result'])
-            elif type(exchData) is dict and (exchData["success"] == True) and type(exchData["result"]) is list and (len(exchData['result']) > 0) and ('tradeId' in exchData['result'][0].keys()):
-                for trade in exchData['result']:
+            if type(exchData) is dict and exchData.has_key('notifications'):
+                if exchData['notifications'][0]['message'] == 'order_book_event':
+                    self.orderBookData(exchData['notifications'][0]['result'])
+                elif exchData['notifications'][0]['message'] == 'trade_event':
+                    trade = exchData['notifications'][0]['result'][0]
                     self.onUpdate([float(trade['price']), float(trade['quantity']), trade['tradeId']],'tradebook_' + str(trade['instrument']))
+                elif exchData['notifications'][0]['message'] == 'user_orders_event':
+                    self.onPrivateUpdate(exchData['notifications'][0]['result'][0])
 
         except Exception as ex:
-            self.onUpdate(exchData)
+            log.error("The following Exception has occured in _On_Message method  : " + str(ex))
 
 
 
@@ -120,15 +122,7 @@ class DerbitConnection():
 
     def _on_open(self, ws):
         log.info("Connection: Connection opened")
-
-        def run(*args):
-            while True:
-                time.sleep(1)
-                ws.send(self.payload)
-            time.sleep(1)
-            ws.close()
-
-        thread.start_new_thread(run, ())
+        ws.send(self.payload)
         if self.onConnected is not None:
             self.onConnected()
 

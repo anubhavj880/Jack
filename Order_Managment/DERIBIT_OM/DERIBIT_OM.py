@@ -149,6 +149,31 @@ class OM():
             intAckMsg = self.handleUnknownMsg(ackMsg['message'])
             return intAckMsg
 
+    def get_Fut_Pos(self):
+
+        ackMsg = self.trading_client.get_pos()
+        if type(ackMsg) == dict and len(ackMsg['result']) !=0:
+            self.balances = {}
+
+            for pdt in ackMsg['result']:
+                self.balances[str(pdt['instrument'].upper())] = float(pdt['size'])
+
+        else:
+            intAckMsg = self.handleUnknownMsg(ackMsg['message'])
+            return intAckMsg
+        return self.balances
+
+    def get_balance(self):
+
+        ackMsg = self.trading_client.get_balance()
+        if type(ackMsg) == dict and ackMsg.has_key("result"):
+            return (ackMsg['result']['balance'],ackMsg['result']['availableFunds'])
+        else:
+            intAckMsg = self.handleUnknownMsg(ackMsg['message'])
+            return intAckMsg
+
+
+
     def handleUnknownMsg(self, ackMsg):
         if ackMsg is None:
             return 'INT_ERR_0'
@@ -161,4 +186,4 @@ class OM():
 
 #print(OM().trading_client.get_openorders())
 #print(OM().trading_client.cancel_order("4680272953"))
-#print(OM().trading_client.get_balance())
+#print(OM().get_balance())

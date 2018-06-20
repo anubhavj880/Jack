@@ -77,6 +77,9 @@ class TradeClient():
         sig += base64.b64encode(sha256.digest()).decode("utf-8")
         return sig
 
+    def get_pos(self):
+        return self.request("/api/v1/private/positions", {})
+
     def get_balance(self):
         return self.request("/api/v1/private/account", {})
 

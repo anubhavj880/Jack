@@ -96,7 +96,7 @@ class Book():
         for i in range(5):
             msg += '%.8f %.8f | %.8f %.8f\n' % (self.bid(i), self.bidSize(i), self.ask(i), self.askSize(i))
         log.info(msg)
-        print(msg)
+        #print(msg)
 
 key = "M7UPSXUFxxnM"
 secreat = "QGLTLJKX2AWLNHU2OBVGGIGHTOE3363W"
@@ -166,109 +166,50 @@ def onPrivateUpdate(data):
 
 
 def connect_handler(subscription):
-    log.info('Entered connect_handler with schema %s' % (subscription))
+    log.info('Entered connect_handler with schema %s' % (subscription,))
     try:
-        for SocketUrl_payload in subscription:
-            if json.loads(SocketUrl_payload[1])['action'] == '/api/v1/public/getorderbook' or json.loads(SocketUrl_payload[1])['action'] == '/api/v1/public/getlasttrades' :
-                socketThread = multiprocessing.Process(target=start,args=(SocketUrl_payload,'m'))
-                socketThread.daemon = True
-                socketThread.start()
-            if json.loads(SocketUrl_payload[1])['action'] == '/api/v1/private/subscribe':
-                socketThread = multiprocessing.Process(target=start, args=(SocketUrl_payload, 'p'))
-                socketThread.daemon = True
-                socketThread.start()
-
+        DerbitConnection(subscription[0], subscription[1], onUpdate, onPrivateUpdate).connect_Socket()
 
     except Exception as err:
         log.error('The following error has occured in  connect_handler: %s' % (err))
 
-def start(url_and_payload,type):
-    if type == 'm':
-        DerbitConnection(url_and_payload[0],url_and_payload[1], onUpdate).connect_Socket()
-    if type == 'p':
-        DerbitConnection(url_and_payload[0], url_and_payload[1], onPrivateUpdate).connect_Socket()
 
-def publicSchema(channels):
-    argList = []
-    for channel in channels:
-        if channel[0] == 'book':
-            url_payload = []
-            url_payload.append('wss://www.deribit.com/ws/api/v1/')
-            data = json.dumps(
+def publicSchema():
 
-                {
-                    "id": random.randint(99,999999),
-                    "action": "/api/v1/public/getorderbook",
-                    "arguments": {
-                        "instrument": channel[1],
-                        "event": "order_book"
-                    }
+    url = 'wss://www.deribit.com/ws/api/v1/'
+    data = json.dumps(
 
-                }
+        {
+            "id": random.randint(999, 99999),
+            "action": "/api/v1/private/subscribe",
+            "arguments": {
+                "instrument": [
+                    "futures"
+                ],
+                "event": [
+                    "order_book", "user_order", "trade"
+                ]
+            },
+            "sig": generate_signature("/api/v1/private/subscribe", {
+                "instrument": [
+                    "futures"
+                ],
+                "event": [
+                    "order_book", "user_order", "trade"
+                ]
+            })
 
-            )
-            url_payload.append(data)
-            argList.append(url_payload)
+        }
 
-        if channel[0] == 'trade':
-            url_payload = []
-            url_payload.append('wss://www.deribit.com/ws/api/v1/')
-            data = json.dumps(
+    )
 
-                {
-                    "id": random.randint(99,999999),
-                    "action": "/api/v1/public/getlasttrades",
-                    "arguments": {
-                        "instrument": channel[1],
-                        "event": "trade"
-                    }
-
-                }
-
-            )
-            url_payload.append(data)
-            argList.append(url_payload)
-
-        if channel[0] == 'private':
-            url_payload = []
-            url_payload.append('wss://www.deribit.com/ws/api/v1/')
-            data = json.dumps(
-
-                {
-                    "id": random.randint(99,999999),
-                    "action": "/api/v1/private/subscribe",
-                    "arguments": {
-                        "instrument": [
-                            "all"
-                        ],
-                        "event": [
-                            channel[1]
-                        ]
-                    },
-                    "sig": generate_signature("/api/v1/private/subscribe", {
-                        "instrument": [
-                            "all"
-                        ],
-                        "event": [
-                            "user_order"
-                        ]
-                    })
-
-                }
-
-            )
-            print(data)
-            url_payload.append(data)
-            argList.append(url_payload)
-
-    return argList
+    return (url, data)
 
 def main(channels=''):
-    '''
-        If channel is private then give the order id to get current status of the order
 
-    '''
-    publicSchemaList = publicSchema([('trade', 'BTC-29JUN18'),('private', "user_order")])
+
+    publicSchemaList = publicSchema()
+    print(publicSchemaList)
     connect_handler(publicSchemaList)
     while True:
         time.sleep(1)
